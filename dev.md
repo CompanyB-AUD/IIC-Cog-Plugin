@@ -20,6 +20,50 @@ Shared architecture decisions remain open in #10. This guide recommends one base
 
 ## 3. Proposed stack
 
+### One baseline for all three team branches
+
+Company B will use the same documented baseline on `main`, `team/core-and-integration`, `team/ui-ux` and `team/feature-implementation`. The table below is the implementation target for every team, not a menu of per-team alternatives. Exact dependency pins and a runnable scaffold remain deliverables of #13/#40; Company A's acceptance of the cross-company interface remains #10. Do not interpret branch creation as completed implementation.
+
+| Shared concern | Integration contract |
+|---|---|
+| Toolchain | Node 24 LTS, one pinned pnpm version, one root workspace and lockfile; Core selects and verifies compatible exact package versions once |
+| UI/build | TypeScript strict, Preact, Vite + CRXJS, plain CSS; no independent React/Next/Vue app per team |
+| Extension | One MV3 manifest, content-script entry, service worker and build output |
+| Core imports | Target package `@iic/core`; feature modules consume its public exports rather than private cross-team files |
+| Module API | Version 1 descriptor + `init(ctx)`, `apply(settings)`, `teardown()`; one authoritative type definition in `packages/core/src/contract.ts` once implemented |
+| Settings | One versioned `iic.prefs` object in `chrome.storage.local`, module namespaces and descriptor validation; modules call the core client |
+| Controls | Modules declare controls; UI renders them through the common toolbar; no duplicate toolbar or direct module-owned preference store |
+| Content events | Use the typed bus in the shared contract, including reading position/progress and page mutations; agree payload changes before using them |
+| Styling | Shared token ownership and scoped rules; no competing resets or font/contrast controls |
+| Mocks | Implement the same public contract as real services; label them and replace them before integrated acceptance |
+| Testing/output | Root command interface below, shared fixtures, isolated Playwright profile; production output target `dist/` |
+
+The shared contract includes settings get/set, typed bus, scoped styles, position preservation, announcements, page detection and notices. Do not invent missing concrete types independently: resolve them in #10/#22 and publish the exports first. Persisted schema changes require a migration and corresponding compatibility checks. API changes require an ADR and coordination with consumers.
+
+### Team branches and integration
+
+| Branch | Team landing page | Detailed role guide |
+|---|---|---|
+| `team/core-and-integration` | [Core README](teams/core-and-integration/README.md) | [Core role](core-and-integration.md) |
+| `team/ui-ux` | [UI/UX README](teams/ui-ux/README.md) | [UI/UX role](ui-ux.md) |
+| `team/feature-implementation` | [Features README](teams/feature-implementation/README.md) | [Feature role](feature-implementation.md) |
+
+All three branches are created from the same main commit and initially contain identical files. `AGENTS.md` remains canonical on `main` and is inherited, unchanged, by all three. Each team gets its own Markdown guide and README in that common tree; do not replace the root README with a conflicting branch-specific version.
+
+Workflow: issue branch → PR into team branch → small integration PR from team branch into `main` → synchronize `main` back into each team branch. Use merge commits for the long-lived branch promotions/synchronizations so shared history remains recognizable; do not repeatedly squash or rebase those long-lived branches. A task PR can reference its issue, but close the issue only after its required acceptance and main integration are verified. Before a promotion, inspect the complete diff and dependency readiness.
+
+A shared scaffold/API/lockfile change should be integrated to `main` early and then consumed by all teams. The coordinators handle conflicts with the affected owners; never resolve a lockfile or API conflict by blindly taking one side. Team branches are working integration areas, not separate products or releases.
+
+Example for a clean working tree, after the team branches exist:
+
+```sh
+git fetch origin
+git switch -c feat/28-text-spacing origin/team/feature-implementation
+# Implement the issue and open a PR with base team/feature-implementation.
+```
+
+To update a local tracking team branch, first commit or otherwise safely preserve your work, then fetch and fast-forward from its remote. Merge current `origin/main` through the team's reviewed synchronization PR when needed. Do not force-push over teammates' commits.
+
 | Area | Baseline | Purpose / decision |
 |---|---|---|
 | Browser | Chrome stable desktop; Edge best-effort | Record the tested browser/version; no universal compatibility claim |
@@ -184,6 +228,8 @@ Proposed performance budgets from the architecture: initial content-script bundl
 Record exact browser/tool versions, steps, expected/actual results and defects in `docs/testing/`. No scanner-only conformance claims, fabricated participants or assumed successful tests.
 
 ## 12. Collaboration, review and delivery
+
+The three concurrent teams are **Core and Integration**, **UI/UX**, and **Feature Implementation**. See [team ownership and task allocation](docs/team-ownership.md). The project Team field and `team:*` labels identify the lead team; `owner:shared` still means the work requires Company A/B collaboration, not a fourth internal team. Assignees identify individual developers. Each team chooses its assignee and reviewer and remains responsible for tests and documentation.
 
 Use issue-scoped branches such as `feat/28-text-spacing`, `fix/19-reading-anchor`, or `docs/45-user-guide`. Keep PRs small and link requirements plus evidence. Have at least one reviewer; shared-core changes follow the jointly agreed Company A/B review arrangement. These are workflow expectations, not a claim that branch protections are configured.
 
