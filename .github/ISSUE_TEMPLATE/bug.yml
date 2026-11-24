@@ -1,0 +1,31 @@
+name: Bug or accessibility barrier
+description: Report a reproducible defect without disclosing private data
+title: "[Bug] "
+labels: [bug]
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Use a demo page or non-sensitive example; do not include participant identities or private learning material.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, OS, plugin version and assistive technology if relevant
+  - type: textarea
+    id: impact
+    attributes:
+      label: User impact and evidence
+      description: Explain the blocked task, settings, keyboard/focus behavior and relevant requirement. Screenshots or logs must be sanitized.
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Workaround and related issues
