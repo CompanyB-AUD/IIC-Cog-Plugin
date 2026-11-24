@@ -1,0 +1,42 @@
+name: Backlog task
+description: Add a scoped feature, research, documentation or delivery task
+title: "[Task] "
+labels: ["type:task"]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: User need and intended outcome
+      description: Describe who benefits and the observable result.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria and evidence
+      description: Use measurable checks; distinguish requirements from proposals.
+      value: "- [ ] "
+    validations:
+      required: true
+  - type: input
+    id: parent
+    attributes:
+      label: Parent epic and requirement references
+      placeholder: "Epic #5; FR11; AC-E5.1"
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Proposed priority
+      options: [Must, Should, Could]
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies and boundaries
+      description: Link prerequisites, shared decisions and unsupported cases.
+  - type: textarea
+    id: planning
+    attributes:
+      label: Planning
+      description: Suggest a sprint; confirm assignee and estimate with the team. Add this issue to the delivery project and its parent epic during triage.
