@@ -1,5 +1,7 @@
 # Team workflow
 
+Start with [dev.md](dev.md) for the proposed stack and development setup, and [the development plan](docs/development-plan.md) for the delivery sequence. Developers using coding agents should explicitly ask them to read [AGENTS.md](AGENTS.md). Proposed commands and shared architecture choices become authoritative only when implemented and agreed; verify the current checkout.
+
 1. Pick an agreed issue from the project. Confirm its priority, dependencies, acceptance criteria, sprint, assignee and story-point estimate.
 2. Use a feature branch and link the issue in your pull request. Keep changes small and explain observable behavior.
 3. Request review and attach evidence appropriate to the work. Shared-core changes need the cross-company review arrangement agreed in the architecture decision record.

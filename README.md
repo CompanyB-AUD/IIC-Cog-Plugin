@@ -10,6 +10,10 @@ Company B's cognitive-first module for the Intelligent and Inclusive Classroom b
 - [MVP scope and acceptance criteria](https://github.com/CompanyB-AUD/IIC-Cog-Plugin/blob/sprint-1/docs/sprint-1/03-mvp-scope-and-epics.md)
 - [Architecture proposal — decisions still require agreement](https://github.com/CompanyB-AUD/IIC-Cog-Plugin/blob/sprint-1/docs/sprint-1/04-architecture-and-apis.md)
 - [Team workflow](CONTRIBUTING.md)
+- [Developer guide and proposed stack](dev.md)
+- [Coding-agent instructions](AGENTS.md)
+- [Development sequence and team workstreams](docs/development-plan.md)
+- [WhatsApp kickoff message draft](docs/team-whatsapp-message.md)
 - [Project guide](docs/project-management.md)
 
 The current scope prioritizes reading mode, distraction reduction, configurable presentation, guided reading, chunking and progress. Existing-caption support, transcripts, visual alerts and opt-in AI are planned **Should** features; stretch **Could** items are unscheduled.
