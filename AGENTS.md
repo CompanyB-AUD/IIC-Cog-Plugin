@@ -10,6 +10,7 @@ At the time this file was introduced (24 November 2026), `main` contained planni
 
 1. Read the assigned GitHub issue, acceptance criteria, parent epic and dependency links.
 2. Read [dev.md](dev.md), [CONTRIBUTING.md](CONTRIBUTING.md), and [the development plan](docs/development-plan.md).
+   Check the issue's `team:*` label and [team ownership guide](docs/team-ownership.md). The lead team coordinates delivery; do not assign all team members automatically or assume the parent epic owns every child task. Shared demo, testing and documentation remain responsibilities of the three existing teams.
 3. Inspect the affected code, package scripts, lockfile, tests and any nearer `AGENTS.md` files.
 4. Consult the [Sprint 1 scope](https://github.com/CompanyB-AUD/IIC-Cog-Plugin/blob/sprint-1/docs/sprint-1/03-mvp-scope-and-epics.md) and [architecture proposal](https://github.com/CompanyB-AUD/IIC-Cog-Plugin/blob/sprint-1/docs/sprint-1/04-architecture-and-apis.md) where relevant. These files may still live only on `sprint-1`; do not switch branches over a teammate's uncommitted work to read them.
 5. Check recorded decisions in `docs/adr/` if that directory exists. An accepted decision supersedes a proposal. If implementation, issue scope and an accepted decision conflict, explain the conflict and obtain a maintainer decision before changing the shared contract.

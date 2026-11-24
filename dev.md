@@ -185,6 +185,8 @@ Record exact browser/tool versions, steps, expected/actual results and defects i
 
 ## 12. Collaboration, review and delivery
 
+The three concurrent teams are **Core and Integration**, **UI/UX**, and **Feature Implementation**. See [team ownership and task allocation](docs/team-ownership.md). The project Team field and `team:*` labels identify the lead team; `owner:shared` still means the work requires Company A/B collaboration, not a fourth internal team. Assignees identify individual developers. Each team chooses its assignee and reviewer and remains responsible for tests and documentation.
+
 Use issue-scoped branches such as `feat/28-text-spacing`, `fix/19-reading-anchor`, or `docs/45-user-guide`. Keep PRs small and link requirements plus evidence. Have at least one reviewer; shared-core changes follow the jointly agreed Company A/B review arrangement. These are workflow expectations, not a claim that branch protections are configured.
 
 Board statuses: Backlog → Ready → In Progress → In Review → Done; Blocked only when an actual prerequisite prevents useful progress. Native "blocked by" links also show sequencing requirements. Mocks and parallel development are allowed once the interface is agreed, but completion requires real integration evidence.

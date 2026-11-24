@@ -13,6 +13,7 @@ Company B's cognitive-first module for the Intelligent and Inclusive Classroom b
 - [Developer guide and proposed stack](dev.md)
 - [Coding-agent instructions](AGENTS.md)
 - [Development sequence and team workstreams](docs/development-plan.md)
+- [Team ownership and task allocation](docs/team-ownership.md)
 - [WhatsApp kickoff message draft](docs/team-whatsapp-message.md)
 - [Project guide](docs/project-management.md)
 
