@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toolbar wireframe (#12) — draft</title>
+<!--
+  LOW-FIDELITY WIREFRAME for issue #12. Not product code.
+  Plain HTML/CSS/JS, no dependencies. The real toolbar is built in Preact (#14)
+  from module descriptors. See docs/design/mockups.md for the reasoning.
+  All page text is synthetic.
+-->
+<style>
+  :root {
+    --ink: #1a1a1a; --muted: #5c5c5c; --line: #c8c8c8; --fill: #f2f2f2;
+    --paper: #ffffff; --focus: #1a1a1a;
+    --lh: 1.4; --ls: 0em; --ws: 0em; --ps: 1; --measure: 100%;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 16px/1.4 system-ui, sans-serif; color: var(--ink); background: var(--fill); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+  /* Reviewer bar: outside the mock */
+  .review { position: sticky; top: 0; z-index: 50; display: flex; flex-wrap: wrap; gap: 12px 20px;
+    align-items: center; padding: 8px 16px; background: #333; color: #fff; font-size: 14px; }
+  .review label { display: inline-flex; gap: 6px; align-items: center; }
+  .review select { font: inherit; }
+  .review :focus-visible { outline-color: #fff; }
+
+  /* Mock host page */
+  .page { display: grid; grid-template-columns: 200px 1fr; gap: 24px; max-width: 1100px; margin: 0 auto; padding: 24px; }
+  .page.reading-mode { grid-template-columns: 1fr; max-width: 720px; }
+  .page.reading-mode .lms-nav, .page.reading-mode .banner, .page.reading-mode .related { display: none; }
+  .lms-nav, .banner, .related, article { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 16px; }
+  .lms-nav ul { padding-left: 18px; margin: 0; }
+  .banner { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; overflow: hidden; }
+  .banner .ticker { white-space: nowrap; animation: slide 8s linear infinite; }
+  .page.no-motion .ticker { animation-play-state: paused; }
+  @keyframes slide { from { transform: translateX(100%); } to { transform: translateX(-100%); } }
+  @media (prefers-reduced-motion: reduce) { .banner .ticker { animation: none; } }
+  article { line-height: var(--lh); letter-spacing: var(--ls); word-spacing: var(--ws); }
+  article p, article li { max-width: var(--measure); }
+  article p { margin: calc(1em * var(--ps)) 0; }
+  article.ruler p:nth-of-type(2) { background: #fff2a8; box-shadow: 0 0 0 4px #fff2a8; }
+  .related { margin-top: 16px; }
+  .ph { display: block; height: 10px; background: var(--line); border-radius: 3px; margin: 8px 0; }
+  .ph.short { width: 60%; }
+
+  /* Open toolbar pushes the page aside instead of covering it (AC-E1.3, #16). */
+  body.toolbar-open .page { margin-right: var(--panel-w); }
+  :root { --panel-w: 360px; }
+  /* Below 640px there is no room for page + panel side by side: the panel takes the full width. */
+  @media (max-width: 640px) { :root { --panel-w: 100vw; } body.toolbar-open .page { display: none; } }
+
+  /* Launcher */
+  .launcher { position: fixed; right: 16px; bottom: 16px; width: 48px; height: 48px; border-radius: 50%;
+    border: 2px solid var(--ink); background: var(--paper); font: 700 18px system-ui; cursor: pointer; z-index: 20; }
+  .launcher[data-off]::after { content: "Off"; position: absolute; top: -10px; right: -10px; font-size: 11px;
+    background: var(--ink); color: #fff; border-radius: 8px; padding: 1px 5px; }
+
+  /* Panel */
+  .panel { position: fixed; top: 41px; right: 0; bottom: 0; width: var(--panel-w); background: var(--paper);
+    border-left: 2px solid var(--ink); display: flex; flex-direction: column; z-index: 30; }
+  .panel[hidden] { display: none; }
+  .panel header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+  .panel h2 { font-size: 18px; margin: 0; }
+  .panel .body { overflow-y: auto; flex: 1; padding: 0 16px 16px; }
+  .panel h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 16px 0 8px; }
+  .panel footer { border-top: 1px solid var(--line); padding: 12px 16px; display: grid; gap: 10px; }
+  button, select, input { font: inherit; }
+  .btn { min-height: 44px; padding: 8px 14px; border: 2px solid var(--ink); background: var(--paper); border-radius: 6px; cursor: pointer; }
+  .btn.small { min-height: 32px; padding: 4px 10px; }
+  .icon-btn { width: 44px; height: 44px; border: 2px solid transparent; background: none; font-size: 20px; cursor: pointer; border-radius: 6px; }
+
+  .presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .preset { text-align: left; }
+  .preset small { display: block; color: var(--muted); font-size: 13px; }
+  .preset[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .preset[aria-pressed="true"] small { color: #ddd; }
+  .preset.if-built { border-style: dashed; }
+
+  .switch-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 48px; border-bottom: 1px solid var(--fill); }
+  .switch-row label { flex: 1; cursor: pointer; }
+  .switch-row small { display: block; color: var(--muted); font-size: 13px; }
+  input[type="checkbox"][role="switch"] { appearance: none; width: 44px; height: 24px; border: 2px solid var(--ink); border-radius: 12px; position: relative; cursor: pointer; flex: none; margin: 0; }
+  input[type="checkbox"][role="switch"]::before { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--ink); transition: left .15s; }
+  input[type="checkbox"][role="switch"]:checked { background: var(--ink); }
+  input[type="checkbox"][role="switch"]:checked::before { left: 22px; background: #fff; }
+  @media (prefers-reduced-motion: reduce) { input[type="checkbox"][role="switch"]::before { transition: none; } }
+
+  details.more > summary, details.group > summary { min-height: 44px; display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 600; list-style: none; }
+  details.more > summary::-webkit-details-marker, details.group > summary::-webkit-details-marker { display: none; }
+  details.more > summary::before, details.group > summary::before { content: "▸"; width: 1em; }
+  details.more[open] > summary::before, details.group[open] > summary::before { content: "▾"; }
+  details.group { border: 1px solid var(--line); border-radius: 6px; padding: 0 12px; margin: 8px 0; }
+  details.group[open] { padding-bottom: 12px; }
+  .field { display: grid; gap: 4px; margin: 10px 0; }
+  .field .row { display: flex; justify-content: space-between; }
+  .field output { color: var(--muted); }
+  .field input[type="range"] { width: 100%; min-height: 24px; }
+  .field select { min-height: 36px; }
+  .placeholder-note { color: var(--muted); font-size: 14px; font-style: italic; }
+
+  .notices { display: grid; gap: 8px; padding: 0 16px; }
+  .notices:empty { display: none; }
+  .notice { margin-top: 12px; border: 2px solid var(--ink); border-left-width: 6px; padding: 8px 8px 8px 12px; display: flex; gap: 8px; align-items: start; border-radius: 4px; }
+  .notice p { margin: 0; flex: 1; }
+
+  .strip { padding: 8px 16px; background: var(--fill); border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
+  .strip[hidden] { display: none; }
+  .strip .nav { display: flex; gap: 8px; align-items: center; justify-content: space-between; }
+  .strip progress { width: 100%; height: 8px; }
+
+  .confirm { border: 2px solid var(--ink); border-radius: 6px; padding: 10px; display: grid; gap: 8px; }
+  .confirm[hidden] { display: none; }
+  .confirm .actions { display: flex; gap: 8px; }
+
+  .popup { position: fixed; top: 60px; right: 80px; width: 300px; background: var(--paper); border: 2px solid var(--ink); border-radius: 8px; padding: 16px; z-index: 40; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+  .popup[hidden] { display: none; }
+  .popup .tag { font-size: 12px; color: var(--muted); }
+
+  /* Annotation tags */
+  .note { display: none; font: 700 11px system-ui; background: #d33; color: #fff; border-radius: 9px; padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+  body.show-notes .note { display: inline-block; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<div class="review" role="region" aria-label="Wireframe review controls (not part of the design)">
+  <strong>Wireframe #12 — draft</strong>
+  <label>Wireframe state
+    <select id="state">
+      <option value="S1">S1 Closed</option>
+      <option value="S2">S2 Open: first view</option>
+      <option value="S3">S3 Preset chosen, then adjusted</option>
+      <option value="S4">S4 More settings expanded</option>
+      <option value="S5">S5 Reading mode + sections</option>
+      <option value="S6">S6 Reset confirmation</option>
+      <option value="S7">S7 Notice: feature couldn't run</option>
+      <option value="S8">S8 Unsupported page (popup)</option>
+      <option value="S9">S9 Turned off on this site</option>
+    </select>
+  </label>
+  <label><input type="checkbox" id="notes"> Show notes (numbers match mockups.md sections)</label>
+</div>
+
+<!-- Synthetic host page -->
+<div class="page" id="page">
+  <div class="banner" aria-hidden="false"><strong>Announcements</strong><span class="ticker">Week 6 quiz opens Friday · Library hours extended · New discussion posts</span></div>
+  <nav class="lms-nav" aria-label="Course">
+    <ul><li><a href="#r">Course home</a></li><li><a href="#r">Week 6 reading</a></li><li><a href="#r">Assignments</a></li><li><a href="#r">Grades</a></li></ul>
+  </nav>
+  <main>
+    <article id="article">
+      <h1 id="r">Week 6: How cities plan for water</h1>
+      <p>Cities depend on reliable water supply, but planning for it involves many groups with different goals. This reading introduces the main ideas you will use in this week's assignment.</p>
+      <p>First, planners estimate demand. They look at how many people live in an area, how that number is changing, and how much water homes, schools and businesses use each day.</p>
+      <p>Next, they compare demand with supply. Supply can come from rivers, reservoirs, groundwater or recycled water, and each source has costs and risks.</p>
+      <h2>Your notes</h2>
+      <p><label for="notes-field">Write one question about this reading:</label><br>
+        <input id="notes-field" type="text" size="40" placeholder="Typing here is never intercepted"></p>
+      <p>Finally, planners decide how to close the gap, for example by reducing leaks, changing prices or building new storage. Section 2 looks at each option in turn.</p>
+    </article>
+    <aside class="related" aria-label="Related content"><strong>Related</strong><span class="ph"></span><span class="ph short"></span></aside>
+  </main>
+</div>
+
+<!-- S8: extension icon popup -->
+<div class="popup" id="popup" hidden role="dialog" aria-labelledby="popup-title">
+  <div class="tag">Extension icon popup (browser UI, not the page)</div>
+  <h2 id="popup-title" style="font-size:17px">The toolbar can't run on this page</h2>
+  <p>Browser pages, the Chrome Web Store and PDFs opened in Chrome's viewer don't allow extensions.</p>
+  <p><a href="#r">See which pages are supported</a></p>
+  <button class="btn small" id="popup-close">Close</button>
+</div>
+
+<!-- Launcher -->
+<button class="launcher" id="launcher" aria-expanded="false" aria-controls="panel" aria-label="Reading tools"><span aria-hidden="true">Aa</span></button>
+
+<!-- Toolbar panel (non-modal) -->
+<section class="panel" id="panel" aria-labelledby="panel-title" hidden>
+  <header>
+    <h2 id="panel-title">Reading tools <span class="note">4</span></h2>
+    <button class="icon-btn" id="close" aria-label="Close reading tools">✕</button>
+  </header>
+
+  <div class="notices" id="notices" role="status" aria-live="polite"></div>
+
+  <div class="strip" id="strip" hidden>
+    <div class="nav">
+      <button class="btn small" id="prev">Previous</button>
+      <span id="strip-label">Section 3 of 8 · about 6 min left</span>
+      <button class="btn small" id="next">Next</button>
+    </div>
+    <progress id="strip-progress" max="8" value="3" aria-label="Reading progress">3 of 8</progress>
+    <span class="note">S5 · placement owned by #30/#31</span>
+  </div>
+
+  <div class="body" id="off-body" hidden>
+    <p>The toolbar is off on this site. The page is shown as the site made it.</p>
+    <div class="switch-row">
+      <label for="site-on-2">Use on this site</label>
+      <input type="checkbox" role="switch" id="site-on-2">
+    </div>
+  </div>
+
+  <div class="body" id="on-body">
+    <h3 id="presets-h">Presets <span class="note">3</span></h3>
+    <div class="presets" role="group" aria-labelledby="presets-h">
+      <button class="btn preset" aria-pressed="false" data-preset="focus">Focus<small>Hide clutter and stop motion</small></button>
+      <button class="btn preset" aria-pressed="false" data-preset="easier">Easier reading<small>More space between lines and words</small></button>
+      <button class="btn preset if-built" aria-pressed="false" data-preset="captions">Captions on<small>(if built) Larger captions</small></button>
+      <button class="btn preset if-built" aria-pressed="false" data-preset="larger">Larger and clearer<small>(Company A, to agree)</small></button>
+    </div>
+
+    <h3 id="quick-h">Quick switches <span class="note">3</span></h3>
+    <div role="group" aria-labelledby="quick-h">
+      <div class="switch-row"><label for="q-reading">Reading mode<small>Show only the main content</small></label><input type="checkbox" role="switch" id="q-reading" data-setting="readingMode"></div>
+      <div class="switch-row"><label for="q-motion">Stop motion<small>Pause animations where possible</small></label><input type="checkbox" role="switch" id="q-motion" data-setting="stopMotion"></div>
+      <div class="switch-row"><label for="q-ruler">Reading ruler<small>Highlight the line you are reading</small></label><input type="checkbox" role="switch" id="q-ruler" data-setting="ruler"></div>
+    </div>
+
+    <details class="more" id="more">
+      <summary>More settings</summary>
+
+      <details class="group" id="g-reading">
+        <summary>Reading</summary>
+        <div class="field"><div class="row"><label for="s-lh">Line spacing</label><output for="s-lh" id="o-lh">1.4</output></div><input type="range" id="s-lh" min="1" max="2" step="0.1" value="1.4" data-setting="lineHeight"></div>
+        <div class="field"><div class="row"><label for="s-ls">Letter spacing</label><output for="s-ls" id="o-ls">0 em</output></div><input type="range" id="s-ls" min="0" max="0.12" step="0.02" value="0" data-setting="letterSpacing"></div>
+        <div class="field"><div class="row"><label for="s-ws">Word spacing</label><output for="s-ws" id="o-ws">0 em</output></div><input type="range" id="s-ws" min="0" max="0.16" step="0.04" value="0" data-setting="wordSpacing"></div>
+        <div class="field"><div class="row"><label for="s-ps">Paragraph spacing</label><output for="s-ps" id="o-ps">1×</output></div><input type="range" id="s-ps" min="1" max="2" step="0.25" value="1" data-setting="paragraphSpacing"></div>
+        <div class="field"><label for="s-width">Line width</label><select id="s-width" data-setting="lineWidth"><option value="100%">Full</option><option value="70ch">Medium</option><option value="55ch">Narrow</option></select></div>
+        <div class="field"><label for="s-font">Font <span class="note">8 · O1 owner open</span></label><select id="s-font"><option>Page font</option><option>Readable sans-serif</option></select></div>
+        <div class="switch-row"><label for="r-sections">Split into sections<small>One section at a time, with next and previous</small></label><input type="checkbox" role="switch" id="r-sections" data-setting="sections"></div>
+        <div class="switch-row"><label for="r-progress">Show progress<small>Progress bar and estimated time left</small></label><input type="checkbox" role="switch" id="r-progress" data-setting="progress"></div>
+        <div class="field"><div class="row"><label for="s-wpm">Reading speed</label><output for="s-wpm" id="o-wpm">200 words per minute</output></div><input type="range" id="s-wpm" min="100" max="400" step="25" value="200" data-setting="wpm"></div>
+      </details>
+
+      <details class="group">
+        <summary>Focus</summary>
+        <p class="placeholder-note">Reading mode and Stop motion (also in Quick switches). If built: Hide distractions, Spotlight.</p>
+      </details>
+      <details class="group">
+        <summary>See</summary>
+        <p class="placeholder-note">Company A controls: text size, contrast, read aloud, image descriptions. Same control style. <span class="note">8 · O3</span></p>
+      </details>
+      <details class="group">
+        <summary>Hear</summary>
+        <p class="placeholder-note">If built: Caption style (#35), Transcript (#36), Show sound alerts (#37).</p>
+      </details>
+      <details class="group">
+        <summary>Tools</summary>
+        <p class="placeholder-note">If built: Check this page (#38/#39). <a href="#r">Privacy and help</a> opens the options page.</p>
+      </details>
+    </details>
+  </div>
+
+  <footer id="footer">
+    <button class="btn" id="reset">Reset all settings</button>
+    <div class="confirm" id="confirm" hidden role="group" aria-labelledby="confirm-text">
+      <p id="confirm-text" style="margin:0">Reset all settings? This turns off every feature and restores the page.</p>
+      <div class="actions"><button class="btn small" id="confirm-yes">Reset</button><button class="btn small" id="confirm-no">Cancel</button></div>
+    </div>
+    <div class="switch-row"><label for="site-on">Use on this site</label><input type="checkbox" role="switch" id="site-on" checked></div>
+  </footer>
+</section>
+
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => [...document.querySelectorAll(s)];
+  const page = $('#page'), article = $('#article'), root = document.documentElement;
+  const launcher = $('#launcher'), panel = $('#panel');
+  let returnFocusTo = null, activePreset = null, siteOn = true, section = 3;
+
+  const DEFAULTS = { readingMode: false, stopMotion: false, ruler: false, lineHeight: 1.4, letterSpacing: 0,
+    wordSpacing: 0, paragraphSpacing: 1, lineWidth: '100%', sections: false, progress: false, wpm: 200 };
+  const PRESETS = {
+    focus: { readingMode: true, stopMotion: true },
+    easier: { lineHeight: 1.8, letterSpacing: 0.06, wordSpacing: 0.08, paragraphSpacing: 1.5, lineWidth: '70ch' },
+    captions: {}, larger: {},
+  };
+  let settings = { ...DEFAULTS };
+
+  // ---- apply settings to the mock page and to controls ----
+  function apply() {
+    page.classList.toggle('reading-mode', settings.readingMode);
+    page.classList.toggle('no-motion', settings.stopMotion);
+    article.classList.toggle('ruler', settings.ruler);
+    root.style.setProperty('--lh', settings.lineHeight);
+    root.style.setProperty('--ls', settings.letterSpacing + 'em');
+    root.style.setProperty('--ws', settings.wordSpacing + 'em');
+    root.style.setProperty('--ps', settings.paragraphSpacing);
+    root.style.setProperty('--measure', settings.lineWidth);
+    $$('[data-setting]').forEach((el) => {
+      const v = settings[el.dataset.setting];
+      if (el.type === 'checkbox') el.checked = v; else el.value = v;
+    });
+    $('#o-lh').textContent = settings.lineHeight;
+    $('#o-ls').textContent = settings.letterSpacing + ' em';
+    $('#o-ws').textContent = settings.wordSpacing + ' em';
+    $('#o-ps').textContent = settings.paragraphSpacing + '×';
+    $('#o-wpm').textContent = settings.wpm + ' words per minute';
+    const strip = settings.sections || settings.progress;
+    $('#strip').hidden = !strip || !siteOn;
+    const mins = Math.max(1, Math.round((8 - section + 1) * 300 / settings.wpm));
+    $('#strip-label').textContent = (settings.sections ? `Section ${section} of 8 · ` : '') + `about ${mins} min left`;
+    $('#strip-progress').value = section;
+    $('#strip-progress').textContent = `${section} of 8`;
+    $('#prev').hidden = $('#next').hidden = !settings.sections;
+    $$('.preset').forEach((b) => {
+      const on = b.dataset.preset === activePreset;
+      b.setAttribute('aria-pressed', String(on));
+      const name = b.firstChild;
+      const base = name.textContent.replace(' (changed)', '');
+      name.textContent = on && presetChanged() ? base + ' (changed)' : base;
+    });
+  }
+  const presetChanged = () => activePreset && Object.entries(PRESETS[activePreset])
+    .some(([k, v]) => settings[k] !== v);
+
+  // ---- open / close (non-modal; focus returns) ----
+  function open() {
+    if (!panel.hidden) return;
+    const a = document.activeElement;
+    returnFocusTo = a && a !== document.body && !panel.contains(a) ? a : launcher;
+    panel.hidden = false;
+    document.body.classList.add('toolbar-open');
+    launcher.setAttribute('aria-expanded', 'true');
+    (siteOn ? $('.preset') : $('#site-on-2')).focus();
+  }
+  function close() {
+    if (panel.hidden) return;
+    panel.hidden = true;
+    document.body.classList.remove('toolbar-open');
+    launcher.setAttribute('aria-expanded', 'false');
+    hideConfirm(false);
+    (returnFocusTo && returnFocusTo.isConnected ? returnFocusTo : launcher).focus();
+    returnFocusTo = null;
+  }
+  launcher.addEventListener('click', () => panel.hidden ? open() : close());
+  $('#close').addEventListener('click', close);
+  document.addEventListener('keydown', (e) => {
+    // Alt+Shift+A stands in for the chrome.commands shortcut (works even in fields, as a browser command does).
+    if (e.altKey && e.shiftKey && e.code === 'KeyA') { e.preventDefault(); panel.hidden ? open() : close(); return; }
+    // Escape closes only when focus is inside the toolbar; page fields keep their own Escape behaviour.
+    if (e.key === 'Escape' && panel.contains(document.activeElement)) {
+      if (!$('#confirm').hidden) hideConfirm(true); else close();
+    }
+  });
+
+  // ---- controls ----
+  $$('.preset').forEach((b) => b.addEventListener('click', () => {
+    const p = b.dataset.preset;
+    if (activePreset === p && !presetChanged()) { activePreset = null; settings = { ...DEFAULTS }; }
+    else { activePreset = p; settings = { ...DEFAULTS, ...PRESETS[p] }; }
+    apply();
+  }));
+  $$('[data-setting]').forEach((el) => el.addEventListener('input', () => {
+    const k = el.dataset.setting;
+    settings[k] = el.type === 'checkbox' ? el.checked : (el.type === 'range' ? Number(el.value) : el.value);
+    apply();
+  }));
+  $('#prev').addEventListener('click', () => { section = Math.max(1, section - 1); apply(); });
+  $('#next').addEventListener('click', () => { section = Math.min(8, section + 1); apply(); });
+
+  // Reset: inline confirmation, never confirm()
+  function showConfirm() { $('#reset').hidden = true; $('#confirm').hidden = false; $('#confirm-no').focus(); }
+  function hideConfirm(refocus) { $('#confirm').hidden = true; $('#reset').hidden = false; if (refocus) $('#reset').focus(); }
+  $('#reset').addEventListener('click', showConfirm);
+  $('#confirm-no').addEventListener('click', () => hideConfirm(true));
+  $('#confirm-yes').addEventListener('click', () => {
+    settings = { ...DEFAULTS }; activePreset = null; section = 3; apply(); hideConfirm(true);
+    notify('All settings were reset.', false);
+  });
+
+  // Site on/off
+  function setSite(on) {
+    siteOn = on;
+    if (!on) { settings = { ...DEFAULTS }; activePreset = null; }
+    $('#on-body').hidden = !on; $('#footer').hidden = !on; $('#off-body').hidden = on;
+    $('#site-on').checked = on; $('#site-on-2').checked = on;
+    on ? launcher.removeAttribute('data-off') : launcher.setAttribute('data-off', '');
+    launcher.setAttribute('aria-label', on ? 'Reading tools' : 'Reading tools, off on this site');
+    apply();
+  }
+  $('#site-on').addEventListener('change', (e) => { setSite(e.target.checked); if (!e.target.checked) close(); });
+  $('#site-on-2').addEventListener('change', (e) => { setSite(e.target.checked); if (e.target.checked) $('.preset').focus(); });
+
+  // Notices
+  function notify(msg, dismissible = true) {
+    const n = document.createElement('div');
+    n.className = 'notice';
+    const p = document.createElement('p'); p.textContent = msg; n.append(p);
+    if (dismissible) {
+      const x = document.createElement('button');
+      x.className = 'icon-btn'; x.textContent = '✕'; x.setAttribute('aria-label', 'Dismiss message');
+      x.addEventListener('click', () => { n.remove(); $('#close').focus(); });
+      n.append(x);
+    } else setTimeout(() => n.remove(), 5000);
+    const box = $('#notices');
+    box.append(n);
+    while (box.children.length > 3) box.firstChild.remove();
+  }
+
+  // Popup
+  $('#popup-close').addEventListener('click', () => { $('#popup').hidden = true; $('#state').focus(); });
+
+  // ---- reviewer state picker ----
+  function resetAll() {
+    close(); $('#popup').hidden = true; $('#notices').replaceChildren(); setSite(true);
+    settings = { ...DEFAULTS }; activePreset = null; section = 3;
+    $('#more').open = false; $('#g-reading').open = false; apply();
+  }
+  const STATES = {
+    S1() {},
+    S2() { open(); },
+    S3() { activePreset = 'easier'; settings = { ...DEFAULTS, ...PRESETS.easier, lineHeight: 2 }; open(); $('#more').open = true; $('#g-reading').open = true; },
+    S4() { open(); $('#more').open = true; $('#g-reading').open = true; },
+    S5() { settings = { ...DEFAULTS, readingMode: true, sections: true, progress: true }; open(); },
+    S6() { open(); showConfirm(); },
+    S7() { open(); notify("Reading mode couldn't find the main content on this page. Showing Hide distractions instead."); },
+    S8() { $('#popup').hidden = false; $('#popup-close').focus(); },
+    S9() { setSite(false); open(); },
+  };
+  $('#state').addEventListener('change', (e) => { resetAll(); STATES[e.target.value](); apply(); });
+  $('#notes').addEventListener('change', (e) => document.body.classList.toggle('show-notes', e.target.checked));
+
+  // Keep the panel below the reviewer bar, which wraps on narrow windows.
+  const fitPanel = () => { panel.style.top = $('.review').offsetHeight + 'px'; };
+  window.addEventListener('resize', fitPanel); fitPanel();
+
+  apply();
+})();
+</script>
+</body>
+</html>
