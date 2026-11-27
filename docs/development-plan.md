@@ -14,18 +14,19 @@ Deliver one installable, integrated extension with useful cognitive support, acc
 4. Select a small Sprint 2 slice that fits the remaining 24–26 November window. Carry unfinished foundation work forward transparently; update both Sprint field and milestone when the team accepts a change.
 5. Build a single working path: install → activate → toolbar → change one setting → persist → reset. Share a demonstration before broad feature work.
 
-## Suggested workstreams for a twelve-person team
+## Three concurrent development teams
 
-These are proposed responsibility groups, not named assignments or fixed staffing. Rebalance by experience and availability. Product Owner and Scrum Master duties are explicit but can be held alongside a workstream.
+Use the three actual GitHub teams below. Each currently has four memberships, with the organization owner included in all three; do not treat this as twelve distinct available developers. Confirm individual capacity during planning. Product Owner and Scrum Master responsibilities can be held alongside development work.
 
-| Workstream | Suggested people | Initial work | Later responsibility |
-|---|---:|---|---|
-| Shared foundation / integration | 3 | #10, #13, #22, #17, #18, #19 | Contract, worker, settings, Company A integration #24 |
-| Toolbar / accessible UX | 2 | #12, #14, #15 | Focus behavior, presets, keyboard and NVDA collaboration |
-| Cognitive features | 4 | Pair on #25 and #28 | #26 motion, #29 ruler, #30 chunking, #31 progress |
-| Demo / QA / research / documentation | 3 | #11, #23, test fixtures and #40 | Evaluation #41–#44, docs #45, release/presentation evidence |
+| GitHub team | Initial work | Continuing responsibility |
+|---|---|---|
+| Core and Integration | #10, #13, #22, #17 and a basic #23 fixture | Shell, API, storage/reset/position, integration, CI, security/performance and release |
+| UI/UX | #12 and #14 against the agreed contract/mocks | Toolbar, presets, ruler/progress interaction, caption/transcript UI, accessibility and usability coordination |
+| Feature Implementation | #25 and #28 on shared sample content | Reading/content processing, motion, chunking, instructions and optional AI/media/barrier detection |
 
-Quality remains every developer's responsibility. QA defines acceptance fixtures early, not only after implementation. Optional work gets capacity only after the Product Owner checks Must progress. No developer is assumed to belong to Company A.
+See [team ownership](team-ownership.md) for every issue and cross-team handoffs. The issue's Team field and `team:*` label identify the lead team; the individual assignee and reviewer are chosen by that team. Epic ownership coordinates an area but does not override a child issue's lead team.
+
+There is no separate demo/QA/documentation team. Each team tests and documents its own changes. Core coordinates the shared demo harness and release; UI/UX coordinates user/accessibility evaluation; Feature Implementation contributes representative fixtures and feature evidence. Create the minimum demo and test fixtures early; expand evaluation and documentation in later sprints. All teams work concurrently after agreeing interfaces, using labeled mocks where a service is unfinished. Optional work gets capacity only after Must progress is checked.
 
 ## Sequence and sprint checkpoints
 
