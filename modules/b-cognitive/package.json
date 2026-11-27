@@ -1,0 +1,16 @@
+{
+  "name": "@iic/b-cognitive",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@iic/core": "workspace:*",
+    "@mozilla/readability": "0.6.0",
+    "dompurify": "3.5.0"
+  }
+}
