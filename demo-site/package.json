@@ -1,0 +1,11 @@
+{
+  "name": "@iic/demo-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 4173 --strictPort"
+  },
+  "devDependencies": {
+    "vite": "8.3.8"
+  }
+}

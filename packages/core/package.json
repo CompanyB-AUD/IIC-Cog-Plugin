@@ -1,0 +1,16 @@
+{
+  "name": "@iic/core",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./stubs/*": "./src/stubs/*.ts",
+    "./ui/*": "./src/ui/*.tsx"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "preact": "10.29.8"
+  }
+}
