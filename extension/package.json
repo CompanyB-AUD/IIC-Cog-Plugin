@@ -1,0 +1,20 @@
+{
+  "name": "@iic/extension",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "vite build",
+    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.node.json"
+  },
+  "dependencies": {
+    "@iic/core": "workspace:*",
+    "preact": "10.29.8"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "3.0.0",
+    "@preact/preset-vite": "2.10.6",
+    "@types/node": "24.19.2",
+    "vite": "8.3.8"
+  }
+}
