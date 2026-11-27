@@ -2,7 +2,17 @@
 
 Company B's cognitive-first module for the Intelligent and Inclusive Classroom browser accessibility plugin at Ashesi University.
 
-## Project planning
+## Team branches
+
+All three team branches begin at the same main baseline. The shared [developer guide](dev.md) and [agent instructions](AGENTS.md) apply to every team. The executable scaffold is still tracked in #13; do not create three independent applications.
+
+| Team branch | Team README | Role and tasks |
+|---|---|---|
+| `team/core-and-integration` | [Core](teams/core-and-integration/README.md) | [core-and-integration.md](core-and-integration.md) |
+| `team/ui-ux` | [UI/UX](teams/ui-ux/README.md) | [ui-ux.md](ui-ux.md) |
+| `team/feature-implementation` | [Features](teams/feature-implementation/README.md) | [feature-implementation.md](feature-implementation.md) |
+
+## Project planning links
 - [Delivery board](https://github.com/orgs/CompanyB-AUD/projects/1)
 - [Issues and epics](https://github.com/CompanyB-AUD/IIC-Cog-Plugin/issues)
 - [Sprint milestones](https://github.com/CompanyB-AUD/IIC-Cog-Plugin/milestones)
@@ -10,6 +20,11 @@ Company B's cognitive-first module for the Intelligent and Inclusive Classroom b
 - [MVP scope and acceptance criteria](https://github.com/CompanyB-AUD/IIC-Cog-Plugin/blob/sprint-1/docs/sprint-1/03-mvp-scope-and-epics.md)
 - [Architecture proposal — decisions still require agreement](https://github.com/CompanyB-AUD/IIC-Cog-Plugin/blob/sprint-1/docs/sprint-1/04-architecture-and-apis.md)
 - [Team workflow](CONTRIBUTING.md)
+- [Developer guide and proposed stack](dev.md)
+- [Coding-agent instructions](AGENTS.md)
+- [Development sequence and team workstreams](docs/development-plan.md)
+- [Team ownership and task allocation](docs/team-ownership.md)
+- [WhatsApp kickoff message draft](docs/team-whatsapp-message.md)
 - [Project guide](docs/project-management.md)
 
 The current scope prioritizes reading mode, distraction reduction, configurable presentation, guided reading, chunking and progress. Existing-caption support, transcripts, visual alerts and opt-in AI are planned **Should** features; stretch **Could** items are unscheduled.

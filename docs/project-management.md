@@ -11,6 +11,9 @@
 - Optional features: Should and Could work.
 
 ## Fields and labels
+
+The **Team** field and `team:*` labels identify Core and Integration, UI/UX, Feature Implementation, or All teams for shared coordination. There are three development teams; All teams is not a fourth team. Each team has its own filtered task view, plus a Shared coordination view. See [team ownership](team-ownership.md) for task mapping and handoffs. Preserve the separate `owner:shared`/`owner:company-b` labels, which express responsibility across Company A and Company B.
+
 Status: Backlog, Ready, In Progress, In Review, Blocked, Done.
 Priority: Must, Should, Could. Sprint: Sprint 1–5 or Unscheduled. Workstream: Shared platform, Cognitive, Hearing, Lecturer tools, Quality and delivery.
 Estimate is in team-agreed story points and is initially blank. Individual assignees are intentionally unset. The owner:shared label is a responsibility boundary, not confirmation that Company A accepted an assignment.
